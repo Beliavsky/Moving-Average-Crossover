@@ -29,7 +29,7 @@ program price_analysis
   character(len=20), parameter :: start_date = "1900-01-01", &
                                     end_date = "2100-01-01"
   integer, parameter :: trading_days = 252
-  real, parameter :: ret_scale = 100.0
+  real, parameter :: ret_scale = 100.0, bad_num = -9999.0
   integer, parameter :: ma_lengths(numMA) = [100, 200]
 
   ! Declarations for file reading and data storage
@@ -120,7 +120,7 @@ program price_analysis
   do j = 1, nSymbols
     firstIdx = 0; lastIdx = 0; validDays = 0
     do i = 1, validCount
-       if (fprices(i, j) /= -9999.0) then
+       if (fprices(i, j) /= bad_num) then
           validDays = validDays + 1
           if (firstIdx == 0) firstIdx = i
           lastIdx = i
@@ -143,7 +143,7 @@ program price_analysis
     sumSq  = 0.0
     nRet   = 0
     do i = 2, validCount
-       if (fprices(i-1, j) /= -9999.0 .and. fprices(i, j) /= -9999.0) then
+       if (fprices(i-1, j) /= bad_num .and. fprices(i, j) /= bad_num) then
           ret = log(fprices(i, j) / fprices(i-1, j)) * ret_scale
           sumRet = sumRet + ret
           sumSq  = sumSq + ret*ret
@@ -171,13 +171,13 @@ program price_analysis
     do k = 1, numMA
       ma_len = ma_lengths(k)
       allocate(sma(validCount))
-      ! Compute SMA for symbol j over window ma_len (set to -9999.0 if any missing value)
+      ! Compute SMA for symbol j over window ma_len (set to bad_num if any missing value)
       do i = 1, validCount
          if (i >= ma_len) then
             sma(i) = 0.0
             validWindow = .true.
             do pos_loop = i-ma_len+1, i
-              if (fprices(pos_loop, j) == -9999.0) then
+              if (fprices(pos_loop, j) == bad_num) then
                  validWindow = .false.
                  exit
               else
@@ -187,10 +187,10 @@ program price_analysis
             if (validWindow) then
                sma(i) = sma(i) / ma_len
             else
-               sma(i) = -9999.0
+               sma(i) = bad_num
             end if
          else
-            sma(i) = -9999.0
+            sma(i) = bad_num
          end if
       end do
 
@@ -199,8 +199,8 @@ program price_analysis
       sumRetBelow = 0.0; sumSqBelow = 0.0; nBelow = 0
       nRet = 0
       do i = 3, validCount
-         if ( fprices(i-1, j) /= -9999.0 .and. fprices(i, j) /= -9999.0 .and. &
-              sma(i-1) /= -9999.0 ) then
+         if ( fprices(i-1, j) /= bad_num .and. fprices(i, j) /= bad_num .and. &
+              sma(i-1) /= bad_num ) then
             ret = log(fprices(i, j) / fprices(i-1, j)) * ret_scale
             nRet = nRet + 1
             if (fprices(i-1, j) > sma(i-1)) then
@@ -223,8 +223,8 @@ program price_analysis
          aboveAnnVol = annual_vol
          aboveFraction = real(nAbove) / real(nRet)
       else
-         aboveAnnRet = -9999.0
-         aboveAnnVol = -9999.0
+         aboveAnnRet = bad_num
+         aboveAnnVol = bad_num
          aboveFraction = 0.0
       end if
       if (nBelow > 1) then
@@ -236,8 +236,8 @@ program price_analysis
          belowAnnVol = annual_vol
          belowFraction = real(nBelow) / real(nRet)
       else
-         belowAnnRet = -9999.0
-         belowAnnVol = -9999.0
+         belowAnnRet = bad_num
+         belowAnnVol = bad_num
          belowFraction = 0.0
       end if
 
@@ -306,7 +306,7 @@ contains
           pos = pos + pos2
        end if
        if (token == "NA") then
-          priceArray(fieldIndex) = -9999.0
+          priceArray(fieldIndex) = bad_num
        else
           read(token, *) priceArray(fieldIndex)
        end if
