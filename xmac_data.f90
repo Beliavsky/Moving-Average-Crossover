@@ -253,7 +253,20 @@ program price_analysis
 contains
 
   subroutine parse_header(line, symbols, nSymbols)
-    implicit none
+! -----------------------------------------------------------------------------
+! Subroutine: parse_header
+!
+! Description:
+!   Parses the header line of the CSV file to extract the symbol names.
+!   Assumes the first field is "Date" and the remaining fields are symbol names.
+!
+! Inputs:
+!   line     - The header line from the CSV file.
+!
+! Outputs:
+!   symbols  - Allocatable array containing the extracted symbol names.
+!   nSymbols - The number of symbols extracted.
+! -----------------------------------------------------------------------------
     character(len=*), intent(in) :: line
     character(len=20), allocatable, intent(out) :: symbols(:)
     integer, intent(out) :: nSymbols
@@ -281,7 +294,20 @@ contains
   end subroutine parse_header
 
   subroutine parse_line(line, dateStr, priceArray)
-    implicit none
+! -----------------------------------------------------------------------------
+! Subroutine: parse_line
+!
+! Description:
+!   Parses a data line from the CSV file to extract the date and price values.
+!   Converts missing prices ("NA") to -9999.0.
+!
+! Inputs:
+!   line       - A single line from the CSV file.
+!
+! Outputs:
+!   dateStr    - The extracted date string.
+!   priceArray - Array containing the price data for each symbol.
+! -----------------------------------------------------------------------------
     character(len=*), intent(in) :: line
     character(len=20), intent(out) :: dateStr
     real, intent(out), dimension(:) :: priceArray
