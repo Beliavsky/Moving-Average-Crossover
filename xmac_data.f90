@@ -3,45 +3,40 @@
 !
 ! Description:
 !   This program reads a CSV file (prices.csv) containing price data for several
-!   symbols (columns: Date, SPY, EFA, EEM, EMB, HYG, LQD), filters the data
-!   within a specified date range, and then performs three analyses:
+!   symbols, filters the data within a specified date range, and then performs three 
+!   analyses:
 !
 !     1. It prints, for each symbol, the first and last dates of valid (non-missing)
 !        data along with the total number of valid days.
 !
 !     2. It computes the unconditional annualized return and volatility for each
-!        symbol based on daily log returns (scaled by 100), assuming 252 trading days.
+!        symbol based on daily log returns.
 !
-!     3. For specified moving average (MA) lengths (e.g. 100 and 200 days), it computes
+!     3. For specified moving average (MA) lengths, it computes
 !        the conditional annualized return and volatility for days when the price
 !        (using the previous day's data) is above or below its SMA, along with the
 !        fraction of days in each condition.
 !
 !   Missing prices are represented by "NA" in the CSV file and are converted to -9999.0.
 !
-! Dependencies: Fortran 90 or later.
 ! -----------------------------------------------------------------------------
 
 program price_analysis
   implicit none
 
   ! Parameters and constants
-  integer, parameter :: maxRows = 10000
-  integer, parameter :: maxSymbols = 10
-  character(len=20), parameter :: start_date = "1900-01-01"
-  character(len=20), parameter :: end_date   = "2100-01-01"
+  integer, parameter :: maxRows = 10000, maxSymbols = 10, numMA = 2
+  character(len=20), parameter :: start_date = "1900-01-01", &
+                                    end_date = "2100-01-01"
   integer, parameter :: trading_days = 252
   real, parameter :: ret_scale = 100.0
-  integer, parameter :: numMA = 2
-  integer, dimension(numMA), parameter :: ma_lengths = (/100, 200/)
+  integer, parameter :: ma_lengths(numMA) = [100, 200]
 
   ! Declarations for file reading and data storage
   character(len=100) :: line
-  character(len=20), allocatable :: dates(:)
-  character(len=20), allocatable :: headerSymbols(:)
+  character(len=20), allocatable :: dates(:), headerSymbols(:)
   real, allocatable :: prices(:,:)
-  integer :: nRows, nSymbols, i, j, ios, count
-  integer :: pos, pos2, ma_len
+  integer :: nRows, nSymbols, i, j, ios, count, pos, pos2, ma_len
 
   ! Declarations for analysis
   real :: ret, sumRet, sumSq, meanRet, stdRet
