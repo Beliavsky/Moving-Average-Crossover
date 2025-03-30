@@ -31,7 +31,7 @@ program price_analysis
                                     end_date = "2100-01-01"
   character (len=*), parameter :: prices_file = "prices.csv"
   integer, parameter :: trading_days = 252
-  real(kind=dp), parameter :: ret_scale = 100.0, bad_num = -9999.0
+  real(kind=dp), parameter :: ret_scale = 100.0_dp, bad_num = -9999.0_dp
   integer, parameter :: ma_lengths(numMA) = [100, 200]
 
   ! Declarations for file reading and data storage
@@ -135,10 +135,9 @@ program price_analysis
     end if
   end do
 
-  print *
   ! ---------------------------------------------------------------------------
   ! Unconditional Return and Volatility Analysis
-  print *, "Unconditional returns and volatility"
+  print "(/,a)", "Unconditional returns and volatility"
   print "(A6,2X,A7,2X,A7)", "Symbol", "Ann_Ret", "Ann_Vol"
   do j = 1, nSymbols
     sumRet = 0.0
