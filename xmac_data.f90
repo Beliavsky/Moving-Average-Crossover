@@ -22,6 +22,7 @@
 ! -----------------------------------------------------------------------------
 
 program price_analysis
+  use kind_mod, only: dp
   implicit none
 
   ! Parameters and constants
@@ -30,23 +31,23 @@ program price_analysis
                                     end_date = "2100-01-01"
   character (len=*), parameter :: prices_file = "prices.csv"
   integer, parameter :: trading_days = 252
-  real, parameter :: ret_scale = 100.0, bad_num = -9999.0
+  real(kind=dp), parameter :: ret_scale = 100.0, bad_num = -9999.0
   integer, parameter :: ma_lengths(numMA) = [100, 200]
 
   ! Declarations for file reading and data storage
   character(len=100) :: line
   character(len=20), allocatable :: dates(:), headerSymbols(:), fdates(:)
-  real, allocatable :: prices(:,:)
+  real(kind=dp), allocatable :: prices(:,:)
   integer :: nRows, nSymbols, i, j, ios, ncount, pos, pos2, ma_len, nRet
 
   ! Declarations for analysis
-  real :: ret, sumRet, sumSq, meanRet, stdRet, annual_ret, annual_vol
-  real, allocatable :: sma(:), fprices(:,:)
+  real(kind=dp) :: ret, sumRet, sumSq, meanRet, stdRet, annual_ret, annual_vol
+  real(kind=dp), allocatable :: sma(:), fprices(:,:)
   integer :: nAbove, nBelow, k, idx, validCount, pos_loop, &
      firstIdx, lastIdx, validDays, iu
-  real :: sumRetAbove, sumSqAbove, sumRetBelow, sumSqBelow
-  real :: aboveAnnRet, aboveAnnVol, aboveFraction
-  real :: belowAnnRet, belowAnnVol, belowFraction
+  real(kind=dp) :: sumRetAbove, sumSqAbove, sumRetBelow, sumSqBelow
+  real(kind=dp) :: aboveAnnRet, aboveAnnVol, aboveFraction
+  real(kind=dp) :: belowAnnRet, belowAnnVol, belowFraction
   logical :: validWindow
 
   ! ---------------------------------------------------------------------------
@@ -155,7 +156,7 @@ program price_analysis
        meanRet = sumRet / nRet
        stdRet  = sqrt((sumSq - nRet*meanRet*meanRet) / (nRet-1))
        annual_ret = meanRet * trading_days
-       annual_vol = stdRet * sqrt(real(trading_days))
+       annual_vol = stdRet * sqrt(real(trading_days, kind=dp))
        write(*, "(A6,2X,F7.2,2X,F7.2)") trim(headerSymbols(j)), annual_ret, annual_vol
     else
        write(*, "(A6,2X,A)") trim(headerSymbols(j)), ": No sufficient data"
@@ -219,10 +220,10 @@ program price_analysis
          meanRet = sumRetAbove / nAbove
          stdRet = sqrt((sumSqAbove - nAbove*meanRet*meanRet) / (nAbove - 1))
          annual_ret = meanRet * trading_days
-         annual_vol = stdRet * sqrt(real(trading_days))
+         annual_vol = stdRet * sqrt(real(trading_days, kind=dp))
          aboveAnnRet = annual_ret
          aboveAnnVol = annual_vol
-         aboveFraction = real(nAbove) / real(nRet)
+         aboveFraction = real(nAbove, kind=dp) / real(nRet, kind=dp)
       else
          aboveAnnRet = bad_num
          aboveAnnVol = bad_num
@@ -232,10 +233,10 @@ program price_analysis
          meanRet = sumRetBelow / nBelow
          stdRet = sqrt((sumSqBelow - nBelow*meanRet*meanRet) / (nBelow - 1))
          annual_ret = meanRet * trading_days
-         annual_vol = stdRet * sqrt(real(trading_days))
+         annual_vol = stdRet * sqrt(real(trading_days, kind=dp))
          belowAnnRet = annual_ret
          belowAnnVol = annual_vol
-         belowFraction = real(nBelow) / real(nRet)
+         belowFraction = real(nBelow, kind=dp) / real(nRet, kind=dp)
       else
          belowAnnRet = bad_num
          belowAnnVol = bad_num
@@ -308,9 +309,9 @@ contains
 !   dateStr    - The extracted date string.
 !   priceArray - Array containing the price data for each symbol.
 ! -----------------------------------------------------------------------------
-    character(len=*), intent(in) :: line
+    character(len=*) , intent(in)  :: line
     character(len=20), intent(out) :: dateStr
-    real, intent(out), dimension(:) :: priceArray
+    real(kind=dp), intent(out)     :: priceArray(:)
     character(len=200) :: tmp
     character(len=20) :: token
     integer :: pos, pos2, fieldIndex
