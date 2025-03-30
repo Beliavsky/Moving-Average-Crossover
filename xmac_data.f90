@@ -241,8 +241,9 @@ program price_analysis
          belowFraction = 0.0
       end if
 
-      write(*, '(A6,2X,F9.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2)') &
-           trim(headerSymbols(j)), real(ma_len), aboveAnnRet, aboveAnnVol, aboveFraction, belowAnnRet, belowAnnVol, belowFraction
+      write(*, '(A6,2X,i9,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2)') &
+           trim(headerSymbols(j)), ma_len, aboveAnnRet, aboveAnnVol, aboveFraction, &
+           belowAnnRet, belowAnnVol, belowFraction
 
       deallocate(sma)
     end do
