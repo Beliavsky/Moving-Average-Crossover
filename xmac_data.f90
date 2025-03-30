@@ -34,33 +34,19 @@ program price_analysis
 
   ! Declarations for file reading and data storage
   character(len=100) :: line
-  character(len=20), allocatable :: dates(:), headerSymbols(:)
+  character(len=20), allocatable :: dates(:), headerSymbols(:), fdates(:)
   real, allocatable :: prices(:,:)
-  integer :: nRows, nSymbols, i, j, ios, count, pos, pos2, ma_len
+  integer :: nRows, nSymbols, i, j, ios, ncount, pos, pos2, ma_len, nRet
 
   ! Declarations for analysis
-  real :: ret, sumRet, sumSq, meanRet, stdRet
-  integer :: nRet
-  real :: annual_ret, annual_vol
-
-  ! Declarations for moving average conditional analysis
-  real, allocatable :: sma(:)
-  integer :: nAbove, nBelow, k, idx
+  real :: ret, sumRet, sumSq, meanRet, stdRet, annual_ret, annual_vol
+  real, allocatable :: sma(:), fprices(:,:)
+  integer :: nAbove, nBelow, k, idx, validCount, pos_loop, &
+     firstIdx, lastIdx, validDays
   real :: sumRetAbove, sumSqAbove, sumRetBelow, sumSqBelow
   real :: aboveAnnRet, aboveAnnVol, aboveFraction
   real :: belowAnnRet, belowAnnVol, belowFraction
-
-  ! Declarations for filtered data
-  character(len=20), allocatable :: fdates(:)
-  real, allocatable :: fprices(:,:)
-  integer :: validCount
-
-  ! Additional loop variable for SMA calculation
-  integer :: pos_loop
   logical :: validWindow
-
-  ! Variables for printing date ranges
-  integer :: firstIdx, lastIdx, validDays
 
   ! ---------------------------------------------------------------------------
   ! First pass: count the number of data rows (excluding header)
@@ -75,8 +61,7 @@ program price_analysis
   close(10)
 
   ! Allocate arrays for all data rows
-  allocate(dates(nRows))
-  allocate(prices(nRows, maxSymbols))
+  allocate(dates(nRows), prices(nRows, maxSymbols))
 
   ! ---------------------------------------------------------------------------
   ! Read header to get symbols (first field is Date; remaining are symbol names)
@@ -93,11 +78,11 @@ program price_analysis
   allocate(prices(nRows, nSymbols))
 
   ! Read each data line into dates and prices arrays
-  count = 0
+  ncount = 0
   do i = 1, nRows
      read(10, '(A)') line
-     count = count + 1
-     call parse_line(line, dates(count), prices(count,1:nSymbols))
+     ncount = ncount + 1
+     call parse_line(line, dates(ncount), prices(ncount,1:nSymbols))
   end do
   close(10)
 
@@ -271,15 +256,15 @@ contains
     character(len=20), allocatable, intent(out) :: symbols(:)
     integer, intent(out) :: nSymbols
     character(len=200) :: tmp
-    integer :: i, count, pos, pos2
+    integer :: i, ncount, pos, pos2
 
     tmp = trim(line)
-    count = 0
+    ncount = 0
     do i = 1, len_trim(tmp)
-      if (tmp(i:i) == ",") count = count + 1
+      if (tmp(i:i) == ",") ncount = ncount + 1
     end do
-    ! First field is Date, so nSymbols = count
-    nSymbols = count
+    ! First field is Date, so nSymbols = ncount
+    nSymbols = ncount
     allocate(symbols(nSymbols))
     pos = index(tmp, ",") + 1
     do i = 1, nSymbols
