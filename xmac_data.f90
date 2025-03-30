@@ -2,7 +2,7 @@
 ! Program: price_analysis
 !
 ! Description:
-!   This program reads a CSV file (prices.csv) containing price data for several
+!   This program reads a CSV file prices_file containing price data for several
 !   symbols, filters the data within a specified date range, and then performs three 
 !   analyses:
 !
@@ -28,6 +28,7 @@ program price_analysis
   integer, parameter :: maxRows = 10000, maxSymbols = 10, numMA = 2
   character(len=20), parameter :: start_date = "1900-01-01", &
                                     end_date = "2100-01-01"
+  character (len=*), parameter :: prices_file = "prices.csv"
   integer, parameter :: trading_days = 252
   real, parameter :: ret_scale = 100.0, bad_num = -9999.0
   integer, parameter :: ma_lengths(numMA) = [100, 200]
@@ -51,7 +52,7 @@ program price_analysis
   ! ---------------------------------------------------------------------------
   ! First pass: count the number of data rows (excluding header)
   nRows = 0
-  open(newunit=iu, file="prices.csv", status="old", action="read")
+  open(newunit=iu, file=prices_file, status="old", action="read")
   read(iu, *)  ! Read header line
   do
      read(iu, '(A)', iostat=ios) line
@@ -65,7 +66,7 @@ program price_analysis
 
   ! ---------------------------------------------------------------------------
   ! Read header to get symbols (first field is Date; remaining are symbol names)
-  open(newunit=iu, file="prices.csv", status="old", action="read")
+  open(newunit=iu, file=prices_file, status="old", action="read")
   read(iu, '(A)') line
   call parse_header(line, headerSymbols, nSymbols)
   if (nSymbols > maxSymbols) then
@@ -114,7 +115,7 @@ program price_analysis
   ! ---------------------------------------------------------------------------
   ! Print Date Ranges for Each Symbol
   print *
-  print *, "prices_file: prices.csv"
+  print *, "prices_file: " // trim(prices_file)
   print *
   print '(A6,2X,A10,2X,A10,2X,A4)', "Symbol", "First_Date", "Last_Date", "Days"
   do j = 1, nSymbols
