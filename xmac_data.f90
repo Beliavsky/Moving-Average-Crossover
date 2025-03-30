@@ -55,7 +55,7 @@ program price_analysis
   open(newunit=iu, file=prices_file, status="old", action="read")
   read(iu, *)  ! Read header line
   do
-     read(iu, '(A)', iostat=ios) line
+     read(iu, "(A)", iostat=ios) line
      if (ios /= 0) exit
      nRows = nRows + 1
   end do
@@ -67,7 +67,7 @@ program price_analysis
   ! ---------------------------------------------------------------------------
   ! Read header to get symbols (first field is Date; remaining are symbol names)
   open(newunit=iu, file=prices_file, status="old", action="read")
-  read(iu, '(A)') line
+  read(iu, "(A)") line
   call parse_header(line, headerSymbols, nSymbols)
   if (nSymbols > maxSymbols) then
      print *, "Error: number of symbols exceeds maxSymbols"
@@ -81,7 +81,7 @@ program price_analysis
   ! Read each data line into dates and prices arrays
   ncount = 0
   do i = 1, nRows
-     read(iu, '(A)') line
+     read(iu, "(A)") line
      ncount = ncount + 1
      call parse_line(line, dates(ncount), prices(ncount,1:nSymbols))
   end do
@@ -117,7 +117,7 @@ program price_analysis
   print *
   print *, "prices_file: " // trim(prices_file)
   print *
-  print '(A6,2X,A10,2X,A10,2X,A4)', "Symbol", "First_Date", "Last_Date", "Days"
+  print "(A6,2X,A10,2X,A10,2X,A4)", "Symbol", "First_Date", "Last_Date", "Days"
   do j = 1, nSymbols
     firstIdx = 0; lastIdx = 0; validDays = 0
     do i = 1, validCount
@@ -128,9 +128,9 @@ program price_analysis
        end if
     end do
     if (firstIdx > 0) then
-       write(*, '(A6,2X,A10,2X,A10,2X,I4)') trim(headerSymbols(j)), trim(fdates(firstIdx)), trim(fdates(lastIdx)), validDays
+       write(*, "(A6,2X,A10,2X,A10,2X,I4)") trim(headerSymbols(j)), trim(fdates(firstIdx)), trim(fdates(lastIdx)), validDays
     else
-       write(*, '(A6,2X,A)') trim(headerSymbols(j)), ": No valid data"
+       write(*, "(A6,2X,A)") trim(headerSymbols(j)), ": No valid data"
     end if
   end do
 
@@ -138,7 +138,7 @@ program price_analysis
   ! ---------------------------------------------------------------------------
   ! Unconditional Return and Volatility Analysis
   print *, "Unconditional returns and volatility"
-  print '(A6,2X,A7,2X,A7)', "Symbol", "Ann_Ret", "Ann_Vol"
+  print "(A6,2X,A7,2X,A7)", "Symbol", "Ann_Ret", "Ann_Vol"
   do j = 1, nSymbols
     sumRet = 0.0
     sumSq  = 0.0
@@ -156,9 +156,9 @@ program price_analysis
        stdRet  = sqrt((sumSq - nRet*meanRet*meanRet) / (nRet-1))
        annual_ret = meanRet * trading_days
        annual_vol = stdRet * sqrt(real(trading_days))
-       write(*, '(A6,2X,F7.2,2X,F7.2)') trim(headerSymbols(j)), annual_ret, annual_vol
+       write(*, "(A6,2X,F7.2,2X,F7.2)") trim(headerSymbols(j)), annual_ret, annual_vol
     else
-       write(*, '(A6,2X,A)') trim(headerSymbols(j)), ": No sufficient data"
+       write(*, "(A6,2X,A)") trim(headerSymbols(j)), ": No sufficient data"
     end if
   end do
 
@@ -166,7 +166,7 @@ program price_analysis
   ! ---------------------------------------------------------------------------
   ! Moving Average Conditional Returns Analysis
   print *, "Returns and volatility conditional on the price being above or below the moving average"
-  print '(A6,2X,A9,2X,A14,2X,A14,2X,A14,2X,A14,2X,A14,2X,A14)', "Symbol", "MA_Length", "Ann_Ret_Above", &
+  print "(A6,2X,A9,2X,A14,2X,A14,2X,A14,2X,A14,2X,A14,2X,A14)", "Symbol", "MA_Length", "Ann_Ret_Above", &
        "Ann_Vol_Above", "Fraction_Above", "Ann_Ret_Below", "Ann_Vol_Below", "Fraction_Below"
   do j = 1, nSymbols
     do k = 1, numMA
@@ -242,7 +242,7 @@ program price_analysis
          belowFraction = 0.0
       end if
 
-      write(*, '(A6,2X,i9,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2)') &
+      write(*, "(A6,2X,i9,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2,2X,F14.2)") &
            trim(headerSymbols(j)), ma_len, aboveAnnRet, aboveAnnVol, aboveFraction, &
            belowAnnRet, belowAnnVol, belowFraction
 
