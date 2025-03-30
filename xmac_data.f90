@@ -42,7 +42,7 @@ program price_analysis
   real :: ret, sumRet, sumSq, meanRet, stdRet, annual_ret, annual_vol
   real, allocatable :: sma(:), fprices(:,:)
   integer :: nAbove, nBelow, k, idx, validCount, pos_loop, &
-     firstIdx, lastIdx, validDays
+     firstIdx, lastIdx, validDays, iu
   real :: sumRetAbove, sumSqAbove, sumRetBelow, sumSqBelow
   real :: aboveAnnRet, aboveAnnVol, aboveFraction
   real :: belowAnnRet, belowAnnVol, belowFraction
@@ -51,22 +51,22 @@ program price_analysis
   ! ---------------------------------------------------------------------------
   ! First pass: count the number of data rows (excluding header)
   nRows = 0
-  open(unit=10, file="prices.csv", status="old", action="read")
-  read(10, *)  ! Read header line
+  open(newunit=iu, file="prices.csv", status="old", action="read")
+  read(iu, *)  ! Read header line
   do
-     read(10, '(A)', iostat=ios) line
+     read(iu, '(A)', iostat=ios) line
      if (ios /= 0) exit
      nRows = nRows + 1
   end do
-  close(10)
+  close(iu)
 
   ! Allocate arrays for all data rows
   allocate(dates(nRows), prices(nRows, maxSymbols))
 
   ! ---------------------------------------------------------------------------
   ! Read header to get symbols (first field is Date; remaining are symbol names)
-  open(unit=10, file="prices.csv", status="old", action="read")
-  read(10, '(A)') line
+  open(newunit=iu, file="prices.csv", status="old", action="read")
+  read(iu, '(A)') line
   call parse_header(line, headerSymbols, nSymbols)
   if (nSymbols > maxSymbols) then
      print *, "Error: number of symbols exceeds maxSymbols"
@@ -80,11 +80,11 @@ program price_analysis
   ! Read each data line into dates and prices arrays
   ncount = 0
   do i = 1, nRows
-     read(10, '(A)') line
+     read(iu, '(A)') line
      ncount = ncount + 1
      call parse_line(line, dates(ncount), prices(ncount,1:nSymbols))
   end do
-  close(10)
+  close(iu)
 
   ! ---------------------------------------------------------------------------
   ! Filter rows based on the specified date range (string comparison works for YYYY-MM-DD)
