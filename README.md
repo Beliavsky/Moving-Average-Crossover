@@ -1,6 +1,9 @@
 # Moving Average Crossover
 Test moving average crossover trading systems for various moving average lengths for several assets in R and Fortran. The 
-R output is below. One can see that for several U.S. exchange-traded funds, returns have been higher and volatility lower 
+R output is below. The Fortran code was translated by ChatGPT o3-mini from the R code and then edited slightly. It is not
+written cleanly but gives almost the same results as the R script and is about 10 times faster, 0.2s vs. 2s.
+
+One can see that for several U.S. exchange-traded funds, returns have been higher and volatility lower 
 when yesterday's price closed above the moving average, compared to when it closed below.
 
 ```
