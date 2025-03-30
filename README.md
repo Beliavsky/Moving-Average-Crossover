@@ -1,7 +1,7 @@
 # Moving Average Crossover
-Test moving average crossover trading systems for various moving average lengths for several assets in R. The output is below.
-One can see that for several U.S. exchange-traded funds, returns have been higher and volatility lower when yesterday's price
-closed above the moving average, compared to when it closed below.
+Test moving average crossover trading systems for various moving average lengths for several assets in R and Fortran. The 
+R output is below. One can see that for several U.S. exchange-traded funds, returns have been higher and volatility lower 
+when yesterday's price closed above the moving average, compared to when it closed below.
 
 ```
 prices_file: prices.csv 
